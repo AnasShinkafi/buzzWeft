@@ -98,7 +98,7 @@ export async function fetchUsers({
   sortBy = "desc",
 }: {
   userId: string;
-  searchString: string;
+  searchString?: string;
   pageNumber?: number;
   pageSize?: number;
   sortBy?: SortOrder;
