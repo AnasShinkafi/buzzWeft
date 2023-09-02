@@ -1,6 +1,7 @@
 import { fetchUserPosts } from "@/lib/action/user.action"
 import { redirect } from "next/navigation";
 import BuzzWeftCard from "../cards/BuzzWeftCard";
+import { fetchCommunityPosts } from "@/lib/action/community.action";
 
 interface Props {
   currentUserId: string,
@@ -9,7 +10,13 @@ interface Props {
 }
 
 const BuzzWeftTab = async ({ currentUserId, accountId, accountType }: Props) => {
-  const result = await fetchUserPosts(accountId);
+  let result: any;
+
+  if(accountType === 'Community') {
+    result = await fetchCommunityPosts(accountId)
+  } else {
+    result = await fetchUserPosts(accountId)
+  }
 
   if (!result) redirect('/');
   return (

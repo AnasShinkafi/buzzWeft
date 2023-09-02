@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import User from "../models/user.model";
 import { connectToDB } from "../mongoose";
 import BuzzWeft from "../models/buzzWeft.model";
+import Community from "../models/community.model";
 import { FilterQuery, SortOrder } from "mongoose";
 interface Props {
   userId: string;
@@ -49,11 +50,10 @@ export async function fetchUser(userId: string) {
   try {
     connectToDB();
 
-    return await User.findOne({ id: userId });
-    // .populate({
-    //     path: 'communities',
-    //     model: Community
-    // })
+    return await User.findOne({ id: userId }).populate({
+      path: "communities",
+      model: Community,
+    });
   } catch (error: any) {
     throw new Error(`Failed to fetch user: ${error.message}`);
   }
@@ -67,15 +67,22 @@ export async function fetchUserPosts(userId: string) {
     const buzzWefts = await User.findOne({ id: userId }).populate({
       path: "buzzWefts",
       model: BuzzWeft,
-      populate: {
-        path: "children",
-        model: BuzzWeft,
-        populate: {
-          path: "author",
-          model: User,
-          select: " name image id ",
+      populate: [
+        {
+          path: "community",
+          model: Community,
+          select: " name id image _id",
         },
-      },
+        {
+          path: "children",
+          model: BuzzWeft,
+          populate: {
+            path: "author",
+            model: User,
+            select: " name image id ",
+          },
+        },
+      ],
     });
     return buzzWefts;
   } catch (error) {
@@ -145,12 +152,12 @@ export async function getActivity(userId: string) {
 
     const replies = await BuzzWeft.find({
       _id: { $in: childBuzzs },
-      author: { $ne: userId }
+      author: { $ne: userId },
     }).populate({
-      path: 'author',
+      path: "author",
       model: User,
-      select: ' name image _id '
-    })
+      select: " name image _id ",
+    });
 
     return replies;
   } catch (error: any) {

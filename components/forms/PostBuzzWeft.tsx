@@ -9,11 +9,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { BuzzWeftValidation } from "@/lib/validation/buzzweft";
 import { Textarea } from "../ui/textarea";
 import { createBuzz } from "@/lib/action/buzz.action";
+import { useOrganization } from "@clerk/nextjs";
  
 
 const PostBuzzWeft = ({ userId }: { userId: string }) => {
   const router = useRouter();
   const pathname = usePathname();
+  const { organization } = useOrganization();
 
   const form = useForm({
     resolver: zodResolver(BuzzWeftValidation),
@@ -27,7 +29,7 @@ const PostBuzzWeft = ({ userId }: { userId: string }) => {
     await createBuzz({
       text: values.buzzWeft,
       author: userId,
-      communityId: null,
+      communityId: organization ? organization.id : null,
       path: pathname,
     });
     

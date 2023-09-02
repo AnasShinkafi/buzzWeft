@@ -14,7 +14,6 @@ import { isBase64Image } from "@/lib/utils";
 import { useUploadThing } from '@/lib/uploadthing';
 import { updateUser } from "@/lib/action/user.action";
 import { usePathname, useRouter } from "next/navigation";
-import path from "path";
 
 interface Props {
     user: {
